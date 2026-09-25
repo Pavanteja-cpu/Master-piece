@@ -2,24 +2,57 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Masterpiece Pro</title>
+<title>Pavan Teja Masterpiece</title>
 <style>
-body{background:#0a1931;color:white;font-family:sans-serif;margin:0;padding:15px}
-.card{background:#13294b;border-radius:15px;padding:15px;margin:10px 0}
-.progress{height:8px;background:#333;border-radius:5px}
-.bar{height:8px;background:#4ade80;border-radius:5px}
+body{background:#0a1931;color:white;font-family:sans-serif;padding:15px;margin:0}
+.card{background:#13294b;padding:18px;border-radius:18px;margin-bottom:15px}
+button{padding:10px 16px;border-radius:10px;border:none;font-weight:bold;background:#4ade80;cursor:pointer}
+.opt{width:100%;margin:6px 0;background:#1e3a5f;color:white;text-align:left}
+.progress{height:8px;background:#333;border-radius:10px;margin-top:8px}
+.bar{height:8px;background:#4ade80;border-radius:10px}
+h2{color:#4ade80}
 </style>
 </head>
 <body>
 <h2>Good Evening, Pavan Teja! 👋</h2>
+
+<div id="home">
 <div class="card">
 <h3>🔥 DAILY CHALLENGE #42</h3>
 <p>Why do our eyes dilate in dim light?</p>
-`<button onclick="alert('Correct Answer: To allow more light to enter! Pavan Teja Super!')">Play Now</button>`
+<button onclick="startQuiz()">Play Now</button>
 </div>
+
 <h3>Choose Your Subject</h3>
-<div class="card">Mathematics - 82% <div class="progress"><div class="bar" style="width:82%"></div></div></div>
-<div class="card">Physics - 68% <div class="progress"><div class="bar" style="width:68%"></div></div></div>
-<div class="card">Biology - 90% <div class="progress"><div class="bar" style="width:90%"></div></div></div>
+<div class="card" onclick="startQuiz()">📘 Mathematics - 82%<div class="progress"><div class="bar" style="width:82%"></div></div></div>
+<div class="card" onclick="startQuiz()">🔭 Physics - 68%<div class="progress"><div class="bar" style="width:68%"></div></div></div>
+<div class="card" onclick="startQuiz()">🧬 Biology - 90%<div class="progress"><div class="bar" style="width:90%"></div></div></div>
+</div>
+
+<div id="quiz" style="display:none">
+<div class="card">
+<h3 id="q">Question here</h3>
+<button class="opt" onclick="check(1)" id="o1"></button>
+<button class="opt" onclick="check(2)" id="o2"></button>
+<button class="opt" onclick="check(3)" id="o3"></button>
+<p id="res"></p>
+<button onclick="nextQ()" id="nextBtn" style="display:none;background:white;color:black">Next Question ➡️</button>
+<button onclick="goHome()" style="background:#333;color:white;margin-top:10px">Back to Home</button>
+</div>
+</div>
+
+<script>
+let questions=[
+{q:"Why do our eyes dilate in dim light?",o:["To allow more light to enter","To protect from dust","To change color"],a:1},
+{q:"What is 12 x 8?",o:["88","96","108"],a:2},
+{q:"Which planet is called Red Planet?",o:["Jupiter","Mars","Venus"],a:2}
+];
+let cur=0;
+function startQuiz(){cur=0;document.getElementById('home').style.display='none';document.getElementById('quiz').style.display='block';showQ();}
+function showQ(){let qu=questions[cur];document.getElementById('q').innerHTML="Q"+(cur+1)+": "+qu.q;document.getElementById('o1').innerHTML=qu.o[0];document.getElementById('o2').innerHTML=qu.o[1];document.getElementById('o3').innerHTML=qu.o[2];document.getElementById('res').innerHTML="";document.getElementById('nextBtn').style.display='none';}
+function check(opt){if(opt==questions[cur].a){document.getElementById('res').innerHTML="✅ Correct! Pavan Teja Super! 🎉";}else{document.getElementById('res').innerHTML="❌ Wrong! Try next!";}document.getElementById('nextBtn').style.display='block';}
+function nextQ(){cur++;if(cur<questions.length){showQ();}else{document.getElementById('q').innerHTML="🏆 All Done Pavan Teja! You are Master!";document.getElementById('o1').style.display='none';document.getElementById('o2').style.display='none';document.getElementById('o3').style.display='none';document.getElementById('res').innerHTML="Great Job! 👏";document.getElementById('nextBtn').style.display='none';}}
+function goHome(){document.getElementById('home').style.display='block';document.getElementById('quiz').style.display='none';document.getElementById('o1').style.display='block';document.getElementById('o2').style.display='block';document.getElementById('o3').style.display='block';}
+</script>
 </body>
 </html>
