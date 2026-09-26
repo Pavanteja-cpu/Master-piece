@@ -2,57 +2,122 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pavan Teja Masterpiece</title>
+<title>Pavan Teja 1000Q Pro</title>
 <style>
-body{background:#0a1931;color:white;font-family:sans-serif;padding:15px;margin:0}
-.card{background:#13294b;padding:18px;border-radius:18px;margin-bottom:15px}
-button{padding:10px 16px;border-radius:10px;border:none;font-weight:bold;background:#4ade80;cursor:pointer}
-.opt{width:100%;margin:6px 0;background:#1e3a5f;color:white;text-align:left}
-.progress{height:8px;background:#333;border-radius:10px;margin-top:8px}
-.bar{height:8px;background:#4ade80;border-radius:10px}
-h2{color:#4ade80}
+body{background:#0a1931;color:white;font-family:sans-serif;padding:10px;margin:0}
+.card{background:#13294b;padding:16px;border-radius:16px;margin-bottom:10px}
+button{padding:12px;border-radius:10px;border:none;font-weight:bold;cursor:pointer;width:100%;margin:5px 0;font-size:15px}
+.opt{background:#1e3a5f;color:white;text-align:left}
+.correct{background:#22c55e !important;color:black !important}
+.wrong{background:#ef4444 !important}
+.top{display:flex;justify-content:space-between;font-weight:bold}
+.timer{color:#facc15;font-size:20px}
+.hintBtn{background:#f59e0b;color:black;width:48%;display:inline-block}
+.nextBtn{background:white;color:black}
 </style>
 </head>
 <body>
-<h2>Good Evening, Pavan Teja! 👋</h2>
+<div class="top"><span>Q <span id="qnum">1</span>/1000</span><span class="timer">⏱️ <span id="time">30</span>s</span><span>Score: <span id="score">0</span></span></div>
+<p id="subject" style="color:#4ade80">Loading...</p>
 
-<div id="home">
 <div class="card">
-<h3>🔥 DAILY CHALLENGE #42</h3>
-<p>Why do our eyes dilate in dim light?</p>
-<button onclick="startQuiz()">Play Now</button>
-</div>
-
-<h3>Choose Your Subject</h3>
-<div class="card" onclick="startQuiz()">📘 Mathematics - 82%<div class="progress"><div class="bar" style="width:82%"></div></div></div>
-<div class="card" onclick="startQuiz()">🔭 Physics - 68%<div class="progress"><div class="bar" style="width:68%"></div></div></div>
-<div class="card" onclick="startQuiz()">🧬 Biology - 90%<div class="progress"><div class="bar" style="width:90%"></div></div></div>
-</div>
-
-<div id="quiz" style="display:none">
-<div class="card">
-<h3 id="q">Question here</h3>
-<button class="opt" onclick="check(1)" id="o1"></button>
-<button class="opt" onclick="check(2)" id="o2"></button>
-<button class="opt" onclick="check(3)" id="o3"></button>
-<p id="res"></p>
-<button onclick="nextQ()" id="nextBtn" style="display:none;background:white;color:black">Next Question ➡️</button>
-<button onclick="goHome()" style="background:#333;color:white;margin-top:10px">Back to Home</button>
+<h3 id="q"></h3>
+<button class="opt" id="o0" onclick="check(0)"></button>
+<button class="opt" id="o1" onclick="check(1)"></button>
+<button class="opt" id="o2" onclick="check(2)"></button>
+<button class="opt" id="o3" onclick="check(3)"></button>
+<p id="hintBox" style="display:none;background:#1e293b;padding:10px;border-radius:8px;color:#fde68a"></p>
+<p id="res" style="font-weight:bold;min-height:20px"></p>
+<div style="display:flex;gap:5%;justify-content:space-between">
+<button class="hintBtn" id="hintBtn" onclick="showHint()">💡 Hint</button>
+<button class="nextBtn" id="nextBtn" onclick="nextQ()" style="display:none;width:48%">Next ➡️</button>
 </div>
 </div>
 
 <script>
-let questions=[
-{q:"Why do our eyes dilate in dim light?",o:["To allow more light to enter","To protect from dust","To change color"],a:1},
-{q:"What is 12 x 8?",o:["88","96","108"],a:2},
-{q:"Which planet is called Red Planet?",o:["Jupiter","Mars","Venus"],a:2}
+let hints={
+"Force":"Newton 2nd law gurtu techuko: F=ma",
+"Carbon":"Periodic table lo 6th element",
+"cell":"Cell is basic unit, powerhouse ante energy ichedi",
+"a+b":"Formula: (a+b)² = a²+2ab+b²",
+"Speed":"Distance / Time",
+"Water":"H2O = 2 Hydrogen + 1 Oxygen",
+"Chromosome":"Human lo 23 pairs = 46",
+"√":"Square root ante reverse of square",
+"Newton":"Inertia ante marpu ni vyatirekinchadam",
+"NaCl":"Salt = Sodium Chloride",
+"default":"9th class textbook lo ee topic chudu, concept easy ye!"
+};
+
+let base=[
+{q:"Unit of Force?",o:["Joule","Newton","Watt","Pascal"],a:1,s:"Physics",h:"Force ki unit enti? F=ma lo vache unit"},
+{q:"Atomic number of Carbon?",o:["4","6","8","12"],a:1,s:"Chemistry",h:"Carbon periodic lo 6th"},
+{q:"Powerhouse of cell?",o:["Nucleus","Mitochondria","Ribosome","Chloroplast"],a:1,s:"Biology",h:"Energy icche organelle"},
+{q:"(a+b)²=?",o:["a²+b²","a²+2ab+b²","a²-b²","2ab"],a:1,s:"Maths",h:"Formula gurthu: a²+2ab+b²"},
+{q:"Speed =?",o:["Dist/Time","Time/Dist","m*a","F*T"],a:0,s:"Physics",h:"Speed = distance divided by time"},
+{q:"Chromosome number human?",o:["44","46","48","23"],a:1,s:"Biology",h:"23 pairs = 46"},
+{q:"NaCl is?",o:["Salt","Acid","Base","Water"],a:0,s:"Chemistry",h:"Common salt"},
+{q:"√64=?",o:["6","8","12","7"],a:1,s:"Maths",h:"8*8=64"}
 ];
-let cur=0;
-function startQuiz(){cur=0;document.getElementById('home').style.display='none';document.getElementById('quiz').style.display='block';showQ();}
-function showQ(){let qu=questions[cur];document.getElementById('q').innerHTML="Q"+(cur+1)+": "+qu.q;document.getElementById('o1').innerHTML=qu.o[0];document.getElementById('o2').innerHTML=qu.o[1];document.getElementById('o3').innerHTML=qu.o[2];document.getElementById('res').innerHTML="";document.getElementById('nextBtn').style.display='none';}
-function check(opt){if(opt==questions[cur].a){document.getElementById('res').innerHTML="✅ Correct! Pavan Teja Super! 🎉";}else{document.getElementById('res').innerHTML="❌ Wrong! Try next!";}document.getElementById('nextBtn').style.display='block';}
-function nextQ(){cur++;if(cur<questions.length){showQ();}else{document.getElementById('q').innerHTML="🏆 All Done Pavan Teja! You are Master!";document.getElementById('o1').style.display='none';document.getElementById('o2').style.display='none';document.getElementById('o3').style.display='none';document.getElementById('res').innerHTML="Great Job! 👏";document.getElementById('nextBtn').style.display='none';}}
-function goHome(){document.getElementById('home').style.display='block';document.getElementById('quiz').style.display='none';document.getElementById('o1').style.display='block';document.getElementById('o2').style.display='block';document.getElementById('o3').style.display='block';}
+
+let allQ=[];
+for(let i=0;i<25;i++) base.forEach(x=>allQ.push({...x}));
+for(let i=0;i<800;i++){
+ let a=Math.floor(Math.random()*50)+1; let b=Math.floor(Math.random()*20)+1;
+ let v, qq, opts, type=Math.floor(Math.random()*4);
+ if(type==0){v=a*b; qq=`${a} x ${b} =?`; opts=[v-2,v,v+2,v+5];}
+ else if(type==1){v=a*a; qq=`What is ${a}²?`; opts=[v-1,v,v+1,v+10];}
+ else if(type==2){v=a+b; qq=`If a=${a}, b=${b}, a+b=?`; opts=[v-1,v,v+1,v+2];}
+ else{v=a*2; qq=`${a}% of 200 =?`; opts=[v-10,v,v+10,v+20];}
+ let sh=opts.map((val,idx)=>({val,idx})); sh.sort(()=>Math.random()-0.5);
+ let newAns=sh.findIndex(x=>x.idx==1);
+ allQ.push({q:qq,o:sh.map(x=>x.val),a:newAns,s:"Maths",h:`Calculation: carefully chey, answer ${sh[newAns].val} daggara undi`});
+}
+allQ.sort(()=>Math.random()-0.5); allQ=allQ.slice(0,1000);
+
+let cur=0, sc=0, timer, timeLeft=30;
+function startTimer(){
+ timeLeft=30; document.getElementById('time').innerText=timeLeft;
+ clearInterval(timer);
+ timer=setInterval(()=>{
+   timeLeft--; document.getElementById('time').innerText=timeLeft;
+   if(timeLeft<=0){clearInterval(timer); autoReveal("⏰ Time Up!");}
+ },1000);
+}
+function showHint(){
+ let qq=allQ[cur];
+ document.getElementById('hintBox').style.display='block';
+ document.getElementById('hintBox').innerText="💡 Hint: "+qq.h;
+ sc=Math.max(0,sc-0); // hint ki marks cut avvu - kavali ante -1 cheyavachu
+}
+function show(){
+ if(cur>=1000){document.getElementById('q').innerText="🏆 1000 DONE! TOPPER PAVAN TEJA!";return;}
+ let qq=allQ[cur];
+ document.getElementById('qnum').innerText=cur+1;
+ document.getElementById('q').innerText=`Q${cur+1}: ${qq.q}`;
+ document.getElementById('subject').innerText=qq.s+" | "+qq.q.substring(0,20);
+ document.getElementById('hintBox').style.display='none';
+ for(let i=0;i<4;i++){let b=document.getElementById('o'+i);b.innerText=qq.o[i];b.className="opt";b.disabled=false;}
+ document.getElementById('res').innerText=""; document.getElementById('nextBtn').style.display='none'; document.getElementById('hintBtn').style.display='inline-block';
+ startTimer();
+}
+function autoReveal(msg){
+ let qq=allQ[cur]; let btns=[0,1,2,3].map(x=>document.getElementById('o'+x)); btns.forEach(b=>b.disabled=true);
+ btns[qq.a].classList.add('correct');
+ document.getElementById('res').innerText=`${msg} ✅ Correct: ${qq.o[qq.a]}`;
+ document.getElementById('nextBtn').style.display='block'; document.getElementById('hintBtn').style.display='none';
+}
+function check(i){
+ clearInterval(timer);
+ let qq=allQ[cur]; let btns=[0,1,2,3].map(x=>document.getElementById('o'+x)); btns.forEach(b=>b.disabled=true);
+ if(i==qq.a){sc++; btns[i].classList.add('correct'); document.getElementById('res').innerText="✅ Correct! Super Pavan Teja!"; document.getElementById('nextBtn').style.display='block';}
+ else{btns[i].classList.add('wrong'); document.getElementById('res').innerText="❌ Wrong! 1 sec lo answer chupista...";
+   setTimeout(()=>{btns[qq.a].classList.add('correct'); document.getElementById('res').innerText=`✅ Correct: ${qq.o[qq.a]} | Hint: ${qq.h}`; document.getElementById('nextBtn').style.display='block';},800);
+ }
+ document.getElementById('score').innerText=sc; document.getElementById('hintBtn').style.display='none';
+}
+function nextQ(){cur++;show();}
+show();
 </script>
 </body>
 </html>
